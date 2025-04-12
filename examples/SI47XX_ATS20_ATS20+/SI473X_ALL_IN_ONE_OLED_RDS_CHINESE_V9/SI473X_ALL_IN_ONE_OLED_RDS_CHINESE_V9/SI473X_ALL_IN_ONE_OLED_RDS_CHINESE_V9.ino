@@ -497,10 +497,11 @@ uint8_t encoderEvent(uint8_t event, uint8_t pin) {
     waitBeforeMute = ENCODER_MUTEDELAY;
   } else if ((BUTTONEVENT_LONGPRESS == event) && (0 != waitBeforeMute))
     if (0 == --waitBeforeMute) {
-      uint8_t x = muteVolume;
-      muteVolume = si4735.getVolume();
-      si4735.setVolume(x);
-      showVolume();
+      // uint8_t x = muteVolume;
+      // muteVolume = si4735.getVolume();
+      // si4735.setVolume(x);
+      // showVolume();
+      enterManualFrequency();
     }
 #else
   if (BUTTONEVENT_FIRSTLONGPRESS == event)
@@ -661,6 +662,69 @@ uint8_t bandEvent(uint8_t event, uint8_t pin) {
 }
 
 
+void enterManualFrequency() {
+  uint8_t freqDigits[5] = {0};
+  uint8_t position = 0;
+
+  oled.clear();
+  oled.setFont(FONT8X16ATARI);
+
+  while (true) {
+    // Clear caret row and draw caret
+    oled.setCursor(24, 1);
+    oled.print("               ");
+    oled.setCursor(24 + position * 16, 1);
+    oled.print("^");
+
+    // Draw digits/underscores
+    oled.setCursor(24, 2);
+    for (int i = 0; i < 5; i++) {
+      if (i <= position)
+        oled.print(freqDigits[i]);
+      else
+        oled.print("_");
+    }
+
+    // Rotate digit with encoder
+    if (encoderCount != 0) {
+      freqDigits[position] = (freqDigits[position] + encoderCount + 10) % 10;
+      encoderCount = 0;
+    }
+
+    // Confirm digit with encoder button
+    if (digitalRead(ENCODER_BUTTON) == LOW) {
+      delay(300);
+      while (digitalRead(ENCODER_BUTTON) == LOW);
+      position++;
+      if (position > 4)
+        break;
+    }
+
+    delay(50);
+  }
+
+  // Convert digits to frequency in kHz
+  uint16_t newFreq = freqDigits[0] * 10000 +
+                     freqDigits[1] * 1000 +
+                     freqDigits[2] * 100 +
+                     freqDigits[3] * 10 +
+                     freqDigits[4];
+
+  // Try to find a matching band
+  bool matched = false;
+  for (int i = 0; i <= lastBand; i++) {
+    if (newFreq >= band[i].minimumFreq && newFreq <= band[i].maximumFreq) {
+      bandIdx = i;
+      band[i].currentFreq = newFreq;
+      useBand();  // applies full band setup
+      matched = true;
+      break;
+    }
+  }
+
+  oled.clear();
+  showStatus();
+}
 
 // Use Rotary.h and  Rotary.cpp implementation to process encoder via interrupt
 void rotaryEncoder() {  // rotary encoder events
