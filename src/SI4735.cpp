@@ -1,6 +1,6 @@
 /**
  * @mainpage SI47XX Arduino Library implementation
- *
+ * 
  * This is a library for the SI473X and SI474X, BROADCAST AM/FM/SW RADIO RECEIVER, IC from Silicon Labs for the
  * Arduino development environment.  It works with I2C protocol and provides an easy-to-use interface for controlling the SI47XX IC family.<br>
  *
@@ -418,7 +418,7 @@ void SI4735::radioPowerUp(void)
     // Delay at least 500 ms between powerup command and first tune command to wait for
     // the oscillator to stabilize if XOSCEN is set and crystal is used as the RCLK.
     waitToSend();
-    delay(maxDelayAfterPouwerUp);
+    delay(maxDelayAfterPowerUp);
 
     // Turns the external mute circuit off
     if (audioMuteMcuPin >= 0)
@@ -2744,7 +2744,7 @@ char *SI4735::getRdsDateTime()
  * here will work in your development environment. Proceed at your own risk.
  * This library works with the I²C communication protocol to send an SSB extension PATCH to
  * SI4735-D60 and SI4732-A10 devices. Once again, the author disclaims any and all liability for any
- * damage or effects this procedure may have on your devices. Procced at your own risk.
+ * damage or effects this procedure may have on your devices. Proceed at your own risk.
  * @see AN332 REV 0.8 UNIVERSAL PROGRAMMING GUIDE; pages 3 and 5
  */
 
@@ -3149,7 +3149,7 @@ void SI4735::patchPowerUp()
     Wire.write(0b00110001);          // This is a condition for loading the patch: Set to AM, Enable External Crystal Oscillator; Set patch enable; GPO2 output disabled; CTS interrupt disabled. You can change this calling setSSB.
     Wire.write(SI473X_ANALOG_AUDIO); // This is a condition for loading the patch: Set to Analog Output. You can change this calling setSSB.
     Wire.endTransmission();
-    delay(maxDelayAfterPouwerUp);
+    delay(maxDelayAfterPowerUp);
 }
 
 /**
@@ -3594,7 +3594,7 @@ void SI4735::patchPowerUpNBFM()
     Wire.write(0b00110000);          // This is a condition for loading the patch: Set to AM, Enable External Crystal Oscillator; Set patch enable; GPO2 output disabled; CTS interrupt disabled.
     Wire.write(SI473X_ANALOG_AUDIO); // This is a condition for loading the patch: Set to Analog Output. You can change this calling setNBFM.
     Wire.endTransmission();
-    delay(maxDelayAfterPouwerUp);
+    delay(maxDelayAfterPowerUp);
 }
 
 /**
@@ -3618,7 +3618,7 @@ void SI4735::loadPatchNBFM(const uint8_t *patch_content, const uint16_t patch_co
 /**
  * @ingroup group20 Patch and NBFM support
  *
- * @brief Set the radio to FM function.
+ * @brief Set the radio to NBFM function.
  *
  * @todo Adjust the power up parameters
  *
